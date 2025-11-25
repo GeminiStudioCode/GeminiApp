@@ -2,33 +2,50 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["main"]  # 这里改成你当前的主分支名字，可能是 master 或 main
+    branches: ["main"] # 确认一下你的主分支是 main 还是 master，如果是 master 请修改这里
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  # 构建任务
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20" # 使用 Node.js 20
+          
+      - name: Install dependencies
+        run: npm install # 安装依赖
+        
+      - name: Build
+        run: npm run build # 核心步骤：把 TSX 编译成 JS
+        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # 如果你的网页文件在根目录，就写 '.'
-          # 如果在 dist 或 build 文件夹，就写 './dist'
-          path: '.'
+          path: ./dist # Vite 默认输出目录是 dist，如果你的配置改了，这里也要改
 
+  # 部署任务
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
