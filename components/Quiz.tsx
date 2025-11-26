@@ -134,12 +134,10 @@ export const Quiz: React.FC<QuizProps> = ({ questions, category, onFinish, onBac
 
     if (isCorrect) {
       setScore(prev => prev + 1);
-      // Auto advance for non-multi-choice questions
-      if (!isMulti) {
-        autoAdvanceTimerRef.current = setTimeout(() => {
-          handleNext(newScore);
-        }, 300); // 0.3 seconds delay
-      }
+      // Auto advance for ALL question types if correct, including Multi-choice
+      autoAdvanceTimerRef.current = setTimeout(() => {
+        handleNext(newScore);
+      }, 300); // 0.3 seconds delay
     } else {
         // Auto-add to favorites (Wrong Answer Collection) if incorrect
         addFavorite(currentQuestion.id);
@@ -209,7 +207,8 @@ export const Quiz: React.FC<QuizProps> = ({ questions, category, onFinish, onBac
       if (isSelected) {
         return baseStyle + "bg-blue-500/30 border-blue-400 text-blue-900 font-medium scale-[1.01] shadow-md";
       }
-      return baseStyle + "bg-white/20 border-white/20 text-gray-800 hover:bg-white/30 hover:border-white/40 active:scale-[0.99]";
+      // Removed hover effects as requested: "cancel mouse placement on options, option highlight page effect"
+      return baseStyle + "bg-white/20 border-white/20 text-gray-800 active:scale-[0.99]";
     }
   };
 

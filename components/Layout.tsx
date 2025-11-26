@@ -7,7 +7,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
+    <div className="h-[100dvh] w-full flex flex-col items-center justify-center p-3 sm:p-4 relative overflow-hidden bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
       
       {/* Dynamic Background Blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
@@ -15,7 +15,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="absolute bottom-[-20%] left-[20%] w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
 
       {/* Main Glass Content Wrapper */}
-      <div className="z-10 w-full max-w-md flex flex-col h-[90vh] max-h-[800px]">
+      <div className="z-10 w-full max-w-md flex flex-col h-full max-h-[800px]">
+        {/* On mobile: rounded-3xl, shadow-2xl, border (restored from desktop only) */}
         <div className="flex-1 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 shadow-2xl overflow-hidden flex flex-col relative">
           {children}
         </div>
