@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question, QuestionCategory } from '../types';
 import { getCategoryTitle } from '../services/questionService';
-import { isFavorite, toggleFavorite } from '../services/storageService';
+import { isFavorite, toggleFavorite, addFavorite, removeFavorite } from '../services/storageService';
 
 interface QuizProps {
   questions: Question[];
@@ -64,6 +64,7 @@ export const Quiz: React.FC<QuizProps> = ({ questions, category, onFinish, onBac
   const currentQuestion = questions[currentIndex];
   const isMulti = currentQuestion.category === QuestionCategory.MULTI;
   const isBoolean = currentQuestion.category === QuestionCategory.BOOLEAN;
+  const isCollectionMode = category.toString().startsWith('COLLECTION');
 
   // Sync state when index changes
   useEffect(() => {
@@ -78,8 +79,27 @@ export const Quiz: React.FC<QuizProps> = ({ questions, category, onFinish, onBac
   }, [currentIndex, currentQuestion]);
 
   const handleFavoriteClick = () => {
-    const newVal = toggleFavorite(currentQuestion.id);
-    setIsCurrentFavorite(newVal);
+    // Special logic for Collection Mode: Removing favorite jumps to next
+    if (isCollectionMode) {
+        if (isCurrentFavorite) {
+            removeFavorite(currentQuestion.id);
+            setIsCurrentFavorite(false);
+            
+            // Auto jump to next question in collection after removal
+            clearAutoAdvance();
+            autoAdvanceTimerRef.current = setTimeout(() => {
+                handleNext(score);
+            }, 300);
+        } else {
+            // Re-adding it (unlikely usage in collection mode but possible)
+            addFavorite(currentQuestion.id);
+            setIsCurrentFavorite(true);
+        }
+    } else {
+        // Normal mode: just toggle
+        const newVal = toggleFavorite(currentQuestion.id);
+        setIsCurrentFavorite(newVal);
+    }
   };
 
   const handleOptionClick = (optionIndex: string) => {
@@ -114,12 +134,16 @@ export const Quiz: React.FC<QuizProps> = ({ questions, category, onFinish, onBac
 
     if (isCorrect) {
       setScore(prev => prev + 1);
-    }
-
-    if (isCorrect && !isMulti) {
-      autoAdvanceTimerRef.current = setTimeout(() => {
-        handleNext(newScore);
-      }, 500);
+      // Auto advance for non-multi-choice questions
+      if (!isMulti) {
+        autoAdvanceTimerRef.current = setTimeout(() => {
+          handleNext(newScore);
+        }, 300); // 0.3 seconds delay
+      }
+    } else {
+        // Auto-add to favorites (Wrong Answer Collection) if incorrect
+        addFavorite(currentQuestion.id);
+        setIsCurrentFavorite(true);
     }
   };
 
@@ -308,6 +332,12 @@ export const Quiz: React.FC<QuizProps> = ({ questions, category, onFinish, onBac
                 </span>
               )}
             </div>
+            {/* Show "Collected" message if it was wrong */}
+            {!isAnswerCorrect() && (
+                 <div className="mt-2 text-xs text-red-700/80 font-medium">
+                     已自动加入错题集
+                 </div>
+            )}
           </div>
         )}
       </div>

@@ -15,6 +15,23 @@ export const isFavorite = (questionId: string): boolean => {
   return favorites.includes(questionId);
 };
 
+export const addFavorite = (questionId: string): void => {
+  const favorites = getFavorites();
+  if (!favorites.includes(questionId)) {
+    favorites.push(questionId);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+  }
+};
+
+export const removeFavorite = (questionId: string): void => {
+  const favorites = getFavorites();
+  const index = favorites.indexOf(questionId);
+  if (index > -1) {
+    favorites.splice(index, 1);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+  }
+};
+
 export const toggleFavorite = (questionId: string): boolean => {
   const favorites = getFavorites();
   const index = favorites.indexOf(questionId);
