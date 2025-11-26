@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { QuestionCategory } from '../types';
-import { getCategoryTitle, getCategoryCount } from '../services/questionService';
+import { getCategoryTitle, getCategoryCount, generateMockQuestions } from '../services/questionService';
 
 interface HomeProps {
   onSelectCategory: (category: QuestionCategory) => void;
@@ -67,7 +67,7 @@ export const Home: React.FC<HomeProps> = ({ onSelectCategory, onOpenCollectionMe
           colorClass="bg-gradient-to-r from-pink-400/60 to-pink-600/60 hover:bg-pink-500/70"
         />
 
-        <div className="border-t border-white/20 pt-4 mt-2">
+        <div className="border-t border-white/20 pt-4 mt-2 space-y-4">
           <CategoryButton 
             title="错题集"
             subTitle="查看收藏的题目"
@@ -76,6 +76,21 @@ export const Home: React.FC<HomeProps> = ({ onSelectCategory, onOpenCollectionMe
             icon={
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+            }
+          />
+          
+          <CategoryButton 
+            title="模拟练习"
+            subTitle="随机抽取20题"
+            onClick={() => {
+                generateMockQuestions();
+                onSelectCategory(QuestionCategory.MOCK);
+            }}
+            colorClass="bg-gradient-to-r from-emerald-400/60 to-emerald-600/60 hover:bg-emerald-500/70"
+            icon={
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
             }
           />

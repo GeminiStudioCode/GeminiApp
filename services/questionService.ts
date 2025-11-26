@@ -114,6 +114,21 @@ const booleanQuestions = parseTrueFalseQuestions(rawTrueFalse);
 const allQuestions = [...singleChoiceQuestions, ...multiChoiceQuestions, ...booleanQuestions];
 const questionsMap = new Map(allQuestions.map(q => [q.id, q]));
 
+// Store for Mock Questions
+let currentMockQuestions: Question[] = [];
+
+export const generateMockQuestions = () => {
+    // Combine all questions
+    const all = [...singleChoiceQuestions, ...multiChoiceQuestions, ...booleanQuestions];
+    // Fisher-Yates shuffle
+    for (let i = all.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [all[i], all[j]] = [all[j], all[i]];
+    }
+    // Pick first 20
+    currentMockQuestions = all.slice(0, 20);
+};
+
 const getQuestionsByOriginalCategory = (originalCategory: QuestionCategory) => {
     const favIds = getFavorites();
     return favIds
@@ -135,6 +150,8 @@ export const getQuestions = (category: QuestionCategory): Question[] => {
         return getQuestionsByOriginalCategory(QuestionCategory.MULTI);
     case QuestionCategory.COLLECTION_BOOLEAN:
         return getQuestionsByOriginalCategory(QuestionCategory.BOOLEAN);
+    case QuestionCategory.MOCK:
+        return currentMockQuestions;
     default:
       return [];
   }
@@ -154,6 +171,8 @@ export const getCategoryTitle = (category: QuestionCategory): string => {
         return "错题集 - 多选";
     case QuestionCategory.COLLECTION_BOOLEAN:
         return "错题集 - 判断";
+    case QuestionCategory.MOCK:
+        return "模拟练习";
     default:
       return "";
   }
@@ -173,6 +192,8 @@ export const getCategoryCount = (category: QuestionCategory): number => {
         return getQuestionsByOriginalCategory(QuestionCategory.MULTI).length;
     case QuestionCategory.COLLECTION_BOOLEAN:
         return getQuestionsByOriginalCategory(QuestionCategory.BOOLEAN).length;
+    case QuestionCategory.MOCK:
+        return currentMockQuestions.length;
     default:
       return 0;
   }
